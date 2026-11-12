@@ -6,7 +6,7 @@
 
 @php
     $fieldStyle = 'width: 100%; box-sizing: border-box; padding: 13px 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; font-family: inherit;';
-    $labelStyle = 'display: block; margin: 0 0 7px; color: #2b2a26; font-weight: bold; font-size: 14px;';
+    $labelStyle = 'display: block; margin: 0 0 7px; color: #12303b; font-weight: bold; font-size: 14px;';
 @endphp
 
 <section style="
@@ -21,7 +21,7 @@
     ">
         <h1 style="
             margin: 0 0 10px;
-            color: #2b2a26;
+            color: #12303b;
             font-size: 36px;
         ">
             Pengaduan
@@ -37,7 +37,7 @@
 
     @if ($errors->any())
         <div style="
-            background: #f3ece0;
+            background: #eaf5f6;
             border: 1px solid #e6c3b5;
             border-radius: 12px;
             color: #a6402a;
@@ -58,7 +58,7 @@
         method="POST"
         style="
             background: white;
-            border: 1px solid #e8e0d2;
+            border: 1px solid #d8e9ee;
             border-radius: 16px;
             padding: 25px;
             margin-bottom: 35px;
@@ -105,7 +105,7 @@
         </button>
     </form>
 
-    <h2 style="margin: 0 0 18px; color: #2b2a26; font-size: 22px;">
+    <h2 style="margin: 0 0 18px; color: #12303b; font-size: 22px;">
         Pengaduan Saya
     </h2>
 
@@ -113,7 +113,7 @@
 
         <div style="
             background: white;
-            border: 1px solid #e8e0d2;
+            border: 1px solid #d8e9ee;
             border-radius: 16px;
             padding: 20px 25px;
             margin-bottom: 16px;
@@ -127,7 +127,7 @@
                 align-items: center;
                 margin-bottom: 8px;
             ">
-                <div style="color: #2b2a26; font-weight: bold; font-size: 17px;">
+                <div style="color: #12303b; font-weight: bold; font-size: 17px;">
                     {{ $complaint->subject }}
                 </div>
 
@@ -136,7 +136,7 @@
                         Sudah dibalas
                     </span>
                 @else
-                    <span style="background: #e3eee8; color: #1f3d36; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold;">
+                    <span style="background: #dff3ee; color: #0a3d4c; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold;">
                         Menunggu balasan
                     </span>
                 @endif
@@ -152,13 +152,13 @@
                 <div style="
                     margin-top: 16px;
                     padding: 14px 16px;
-                    background: #f3ece0;
+                    background: #eaf5f6;
                     border-radius: 12px;
                 ">
-                    <div style="color: #c4592f; font-weight: bold; font-size: 14px; margin-bottom: 6px;">
+                    <div style="color: #0a7d9c; font-weight: bold; font-size: 14px; margin-bottom: 6px;">
                         Balasan dari Perikitty Olshop
                     </div>
-                    <p style="margin: 0; color: #2b2a26; line-height: 1.7; white-space: pre-line;">{{ $complaint->admin_reply }}</p>
+                    <p style="margin: 0; color: #12303b; line-height: 1.7; white-space: pre-line;">{{ $complaint->admin_reply }}</p>
                 </div>
             @endif
 
@@ -168,7 +168,7 @@
 
         <div style="
             background: white;
-            border: 1px solid #e8e0d2;
+            border: 1px solid #d8e9ee;
             border-radius: 16px;
             padding: 35px 25px;
             text-align: center;

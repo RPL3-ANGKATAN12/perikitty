@@ -8,13 +8,13 @@
 
     <a
         href="{{ route('admin.complaints.index') }}"
-        style="display:inline-block;margin-bottom:20px;color:#c4592f;text-decoration:none;font-weight:bold;"
+        style="display:inline-block;margin-bottom:20px;color:#0a7d9c;text-decoration:none;font-weight:bold;"
     >
         ← Kembali ke Pengaduan
     </a>
 
     @if ($errors->any())
-        <div style="background:#f3ece0;border:1px solid #e6c3b5;border-radius:12px;color:#a6402a;padding:14px 20px;margin-bottom:20px;font-size:14px;">
+        <div style="background:#eaf5f6;border:1px solid #e6c3b5;border-radius:12px;color:#a6402a;padding:14px 20px;margin-bottom:20px;font-size:14px;">
             @foreach ($errors->all() as $message)
                 <div>{{ $message }}</div>
             @endforeach

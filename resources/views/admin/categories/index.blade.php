@@ -39,7 +39,7 @@
                 <table style="width:100%;border-collapse:collapse;">
 
                     <thead>
-                        <tr style="background:#f3ece0;">
+                        <tr style="background:#eaf5f6;">
                             <th style="padding:15px;text-align:left;">No</th>
                             <th style="padding:15px;text-align:left;">Nama</th>
                             <th style="padding:15px;text-align:left;">Slug</th>

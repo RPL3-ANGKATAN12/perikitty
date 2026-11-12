@@ -6,7 +6,7 @@
 
 @php
     $fieldStyle = 'width: 100%; box-sizing: border-box; padding: 13px 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; font-family: inherit;';
-    $labelStyle = 'display: block; margin: 0 0 7px; color: #2b2a26; font-weight: bold; font-size: 14px;';
+    $labelStyle = 'display: block; margin: 0 0 7px; color: #12303b; font-weight: bold; font-size: 14px;';
 @endphp
 
 <section style="
@@ -21,7 +21,7 @@
     ">
         <h1 style="
             margin: 0 0 10px;
-            color: #2b2a26;
+            color: #12303b;
             font-size: 36px;
         ">
             Saran
@@ -37,7 +37,7 @@
 
     @if ($errors->any())
         <div style="
-            background: #f3ece0;
+            background: #eaf5f6;
             border: 1px solid #e6c3b5;
             border-radius: 12px;
             color: #a6402a;
@@ -58,7 +58,7 @@
         method="POST"
         style="
             background: white;
-            border: 1px solid #e8e0d2;
+            border: 1px solid #d8e9ee;
             border-radius: 16px;
             padding: 25px;
             margin-bottom: 35px;
@@ -104,7 +104,7 @@
         </button>
     </form>
 
-    <h2 style="margin: 0 0 18px; color: #2b2a26; font-size: 22px;">
+    <h2 style="margin: 0 0 18px; color: #12303b; font-size: 22px;">
         Saran Saya
     </h2>
 
@@ -112,7 +112,7 @@
 
         <div style="
             background: white;
-            border: 1px solid #e8e0d2;
+            border: 1px solid #d8e9ee;
             border-radius: 16px;
             padding: 20px 25px;
             margin-bottom: 16px;
@@ -130,7 +130,7 @@
 
         <div style="
             background: white;
-            border: 1px solid #e8e0d2;
+            border: 1px solid #d8e9ee;
             border-radius: 16px;
             padding: 35px 25px;
             text-align: center;

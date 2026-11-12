@@ -6,7 +6,7 @@
 
 @php
     $fieldStyle = 'width: 100%; box-sizing: border-box; padding: 13px 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; font-family: inherit;';
-    $labelStyle = 'display: block; margin: 0 0 7px; color: #2b2a26; font-weight: bold; font-size: 14px;';
+    $labelStyle = 'display: block; margin: 0 0 7px; color: #12303b; font-weight: bold; font-size: 14px;';
 @endphp
 
 <section style="
@@ -21,7 +21,7 @@
     ">
         <h1 style="
             margin: 0 0 10px;
-            color: #2b2a26;
+            color: #12303b;
             font-size: 36px;
         ">
             Checkout
@@ -38,7 +38,7 @@
     @if ($errors->any())
 
         <div style="
-            background: #f3ece0;
+            background: #eaf5f6;
             border: 1px solid #e6c3b5;
             border-radius: 12px;
             color: #a6402a;
@@ -69,14 +69,14 @@
             method="POST"
             style="
                 background: white;
-                border: 1px solid #e8e0d2;
+                border: 1px solid #d8e9ee;
                 border-radius: 16px;
                 padding: 25px;
             "
         >
             @csrf
 
-            <h2 style="margin: 0 0 20px; color: #2b2a26; font-size: 20px;">
+            <h2 style="margin: 0 0 20px; color: #12303b; font-size: 20px;">
                 Data Pengiriman
             </h2>
 
@@ -123,7 +123,7 @@
                     type="text"
                     value="Batam, Kepulauan Riau"
                     disabled
-                    style="{{ $fieldStyle }} background: #f6f1e7; color: #777;"
+                    style="{{ $fieldStyle }} background: #f0f7f8; color: #777;"
                 >
             </div>
 
@@ -176,12 +176,12 @@
         {{-- Ringkasan pesanan --}}
         <div style="
             background: white;
-            border: 1px solid #e8e0d2;
+            border: 1px solid #d8e9ee;
             border-radius: 16px;
             padding: 25px;
         ">
 
-            <h2 style="margin: 0 0 20px; color: #2b2a26; font-size: 20px;">
+            <h2 style="margin: 0 0 20px; color: #12303b; font-size: 20px;">
                 Ringkasan Pesanan
             </h2>
 
@@ -193,7 +193,7 @@
                     align-items: center;
                     padding-bottom: 14px;
                     margin-bottom: 14px;
-                    border-bottom: 1px solid #e8e0d2;
+                    border-bottom: 1px solid #d8e9ee;
                 ">
 
                     @if ($item['image'])
@@ -215,7 +215,7 @@
                         <div style="
                             width: 60px;
                             height: 60px;
-                            background: #f3ece0;
+                            background: #eaf5f6;
                             border-radius: 10px;
                             flex-shrink: 0;
                         "></div>
@@ -223,7 +223,7 @@
                     @endif
 
                     <div style="flex: 1;">
-                        <div style="color: #2b2a26; font-weight: bold;">
+                        <div style="color: #12303b; font-weight: bold;">
                             {{ $item['name'] }}
                         </div>
                         <div style="color: #777; font-size: 14px;">
@@ -231,7 +231,7 @@
                         </div>
                     </div>
 
-                    <div style="color: #2b2a26; font-weight: bold;">
+                    <div style="color: #12303b; font-weight: bold;">
                         Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
                     </div>
 
@@ -263,8 +263,8 @@
                 display: flex;
                 justify-content: space-between;
                 padding-top: 14px;
-                border-top: 1px solid #e8e0d2;
-                color: #c4592f;
+                border-top: 1px solid #d8e9ee;
+                color: #0a7d9c;
                 font-size: 20px;
                 font-weight: bold;
             ">
@@ -291,7 +291,8 @@
             var fee = option && option.dataset.fee ? parseInt(option.dataset.fee, 10) : null;
 
             if (fee === null) {
-                shippingText.textContent = 'Pilih kecamatan';
+                sh
+                ippingText.textContent = 'Pilih kecamatan';
                 totalText.textContent = 'Rp ' + formatter.format(subtotal);
                 return;
             }

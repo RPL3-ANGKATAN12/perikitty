@@ -1,125 +1,63 @@
 @extends('layouts.app')
-
-@section('title', 'Dashboard Admin - Perikitty Olshop')
-
+@section('title', 'Admin - Perikitty')
 @section('content')
-
-@php
-    $pendingOrders = \App\Models\Order::where('status', 'pending')->count();
-
-    $cards = [
-        [
-            'title' => 'Produk',
-            'desc' => 'Kelola produk dan stok.',
-            'info' => \App\Models\Product::count() . ' produk',
-            'route' => 'admin.products.index',
-        ],
-        [
-            'title' => 'Kategori',
-            'desc' => 'Atur kategori produk.',
-            'info' => \App\Models\Category::count() . ' kategori',
-            'route' => 'admin.categories.index',
-        ],
-        [
-            'title' => 'Pesanan',
-            'desc' => 'Kelola pesanan pelanggan.',
-            'info' => $pendingOrders . ' menunggu konfirmasi',
-            'route' => 'admin.orders.index',
-        ],
-        [
-            'title' => 'Pengaduan',
-            'desc' => 'Balas pengaduan pelanggan.',
-            'info' => \App\Models\Complaint::whereNull('admin_reply')->count() . ' belum dibalas',
-            'route' => 'admin.complaints.index',
-        ],
-        [
-            'title' => 'Saran',
-            'desc' => 'Baca saran dari pelanggan.',
-            'info' => \App\Models\Feedback::count() . ' saran',
-            'route' => 'admin.feedback.index',
-        ],
-        [
-            'title' => 'Pembeli',
-            'desc' => 'Jumlah pembeli terdaftar.',
-            'info' => \App\Models\User::where('is_admin', false)->count() . ' pembeli',
-            'route' => null,
-        ],
-    ];
-@endphp
-
-<section style="
-    max-width: 1100px;
-    margin: auto;
-    padding: 50px 6%;
-">
-
-    <div style="
-        background: #f3ece0;
-        border-radius: 20px;
-        padding: 30px 35px;
-        margin-bottom: 30px;
-    ">
-        <h1 style="margin: 0 0 8px; color: #2b2a26; font-size: 34px;">
-            Dashboard Admin
-        </h1>
-
-        <p style="margin: 0; color: #777;">
-            Selamat datang di panel admin Perikitty Olshop.
-        </p>
+<section style="padding: 60px 8%; min-height: 80vh;">
+    <h1 style="font-size: 36px; margin-bottom: 40px;">Dashboard Admin</h1>
+    
+    {{-- DATA MASTER (PRODUK) --}}
+    <div style="margin-bottom: 60px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="font-size: 24px;">Data Master (Produk)</h2>
+            <a href="{{ route('admin.create') }}" class="btn btn-primary">+ Tambah Produk</a>
+        </div>
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: var(--surface); color: var(--text-muted); font-size: 13px;">
+                    <tr><th style="padding: 16px 24px;">Nama Produk</th><th style="padding: 16px 24px;">Harga</th><th style="padding: 16px 24px;">Stok</th><th style="padding: 16px 24px;">Aksi</th></tr>
+                </thead>
+                <tbody style="font-size: 14px;">
+                    @forelse($products as $p)
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 16px 24px; font-weight: 600;">{{ $p->name }}</td>
+                        <td style="padding: 16px 24px; color: var(--accent); font-weight: 700;">Rp {{ number_format($p->price, 0, ',', '.') }}</td>
+                        <td style="padding: 16px 24px;">{{ $p->stock }}</td>
+                        <td style="padding: 16px 24px;">
+                            <form action="{{ route('admin.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus produk ini?');">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-color: #ef4444; color: #ef4444;">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="4" style="padding: 24px; text-align: center;">Belum ada produk.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div style="
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
-        gap: 22px;
-    ">
-
-        @foreach ($cards as $card)
-
-            @if ($card['route'])
-                <a
-                    href="{{ route($card['route']) }}"
-                    style="
-                        text-decoration: none;
-                        color: inherit;
-                        display: block;
-                        background: white;
-                        border: 1px solid #e8e0d2;
-                        border-radius: 16px;
-                        padding: 26px;
-                    "
-                >
-            @else
-                <div style="
-                    background: white;
-                    border: 1px solid #e8e0d2;
-                    border-radius: 16px;
-                    padding: 26px;
-                ">
-            @endif
-
-                <h3 style="margin: 0 0 8px; color: #1f3d36; font-size: 22px;">
-                    {{ $card['title'] }}
-                </h3>
-
-                <p style="margin: 0 0 14px; color: #777;">
-                    {{ $card['desc'] }}
-                </p>
-
-                <div style="color: #c4592f; font-weight: bold; font-size: 14px;">
-                    {{ $card['info'] }}
-                </div>
-
-            @if ($card['route'])
-                </a>
-            @else
-                </div>
-            @endif
-
-        @endforeach
-
+    {{-- DATA TRANSAKSI (PESANAN) --}}
+    <div>
+        <h2 style="font-size: 24px; margin-bottom: 20px;">Data Transaksi (Pesanan Masuk)</h2>
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: var(--surface); color: var(--text-muted); font-size: 13px;">
+                    <tr><th style="padding: 16px 24px;">No. Pesanan</th><th style="padding: 16px 24px;">Nama</th><th style="padding: 16px 24px;">Total</th><th style="padding: 16px 24px;">Status</th></tr>
+                </thead>
+                <tbody style="font-size: 14px;">
+                    @forelse($orders as $o)
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 16px 24px; font-weight: 600;">{{ $o->order_number }}</td>
+                        <td style="padding: 16px 24px;">{{ $o->name }}</td>
+                        <td style="padding: 16px 24px; color: var(--accent); font-weight: 700;">Rp {{ number_format($o->total, 0, ',', '.') }}</td>
+                        <td style="padding: 16px 24px;"><span style="background: rgba(216, 91, 155, 0.1); color: var(--accent); padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 700;">{{ $o->status }}</span></td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="4" style="padding: 24px; text-align: center;">Belum ada pesanan.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
-
 </section>
-
 @endsection

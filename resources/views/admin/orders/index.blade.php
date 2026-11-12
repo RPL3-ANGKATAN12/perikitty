@@ -27,7 +27,7 @@
                 <table style="width:100%;border-collapse:collapse;">
 
                     <thead>
-                        <tr style="background:#f3ece0;">
+                        <tr style="background:#eaf5f6;">
                             <th style="padding:15px;text-align:left;">No. Pesanan</th>
                             <th style="padding:15px;text-align:left;">Tanggal</th>
                             <th style="padding:15px;text-align:left;">Pembeli</th>
@@ -65,7 +65,7 @@
                                 </td>
 
                                 <td style="padding:15px;">
-                                    <span style="background:#e3eee8;color:#1f3d36;padding:6px 10px;border-radius:20px;font-size:13px;font-weight:bold;">
+                                    <span style="background:#dff3ee;color:#0a3d4c;padding:6px 10px;border-radius:20px;font-size:13px;font-weight:bold;">
                                         {{ $statuses[$order->status] ?? $order->status }}
                                     </span>
                                 </td>

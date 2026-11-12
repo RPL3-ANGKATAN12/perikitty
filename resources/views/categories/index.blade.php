@@ -1,86 +1,16 @@
-@extends('layouts.app')
-
-@section('title', 'Kategori - Perikitty Olshop')
-
+﻿@extends('layouts.app')
+@section('title', 'Kategori - Perikitty')
 @section('content')
-
-<section style="
-    max-width: 1100px;
-    margin: auto;
-    padding: 50px 6%;
-">
-
-    <div style="
-        text-align: center;
-        margin-bottom: 35px;
-    ">
-        <h1 style="
-            margin: 0 0 10px;
-            color: #2b2a26;
-            font-size: 36px;
-        ">
-            Kategori
-        </h1>
-
-        <p style="
-            margin: 0;
-            color: #777;
-        ">
-            Pilih kategori untuk melihat produknya.
-        </p>
-    </div>
-
-    @if ($categories->count())
-
-        <div style="
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
-            gap: 22px;
-        ">
-
-            @foreach ($categories as $category)
-
-                <a
-                    href="{{ route('products.index', ['kategori' => $category->id]) }}"
-                    style="
-                        text-decoration: none;
-                        color: inherit;
-                        display: block;
-                        background: white;
-                        border: 1px solid #e8e0d2;
-                        border-radius: 16px;
-                        padding: 28px 22px;
-                        text-align: center;
-                    "
-                >
-                    <h3 style="margin: 0 0 8px; color: #2b2a26;">
-                        {{ $category->name }}
-                    </h3>
-
-                    <p style="margin: 0; color: #777; font-size: 14px;">
-                        {{ $counts[$category->id] ?? 0 }} produk
-                    </p>
-                </a>
-
+<section style="padding: 60px 5%; background: var(--bg); min-height: 80vh;">
+    <div style="max-width: 1100px; margin: auto; text-align: center;">
+        <h1 style="font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 40px;">Semua Kategori</h1>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+            @foreach(\App\Models\Category::all() as $cat)
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 30px; font-size: 18px; font-weight: 600; color: var(--text);">
+                {{ $cat->name }}
+            </div>
             @endforeach
-
         </div>
-
-    @else
-
-        <div style="
-            background: white;
-            border: 1px solid #e8e0d2;
-            border-radius: 16px;
-            padding: 50px 25px;
-            text-align: center;
-            color: #777;
-        ">
-            Belum ada kategori.
-        </div>
-
-    @endif
-
+    </div>
 </section>
-
 @endsection

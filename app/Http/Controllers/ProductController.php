@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -7,26 +7,15 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $products = Product::with('category')
-            ->where('is_active', true)
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->search . '%');
-            })
-            ->when($request->filled('kategori'), function ($query) use ($request) {
-                $query->where('category_id', $request->kategori);
-            })
-            ->latest()
-            ->get();
-
+        $products = Product::all();
         return view('products.index', compact('products'));
     }
 
-    public function show(Product $product)
+    public function show($id)
     {
-        abort_unless($product->is_active, 404);
-
+        $product = Product::findOrFail($id);
         return view('products.show', compact('product'));
     }
 }

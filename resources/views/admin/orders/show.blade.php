@@ -19,7 +19,7 @@
 
     <a
         href="{{ route('admin.orders.index') }}"
-        style="display:inline-block;margin-bottom:20px;color:#c4592f;text-decoration:none;font-weight:bold;"
+        style="display:inline-block;margin-bottom:20px;color:#0a7d9c;text-decoration:none;font-weight:bold;"
     >
         ← Kembali ke Pesanan
     </a>
@@ -31,7 +31,7 @@
     @endif
 
     @if ($errors->any())
-        <div style="background:#f3ece0;border:1px solid #e6c3b5;border-radius:12px;color:#a6402a;padding:14px 20px;margin-bottom:20px;font-size:14px;">
+        <div style="background:#eaf5f6;border:1px solid #e6c3b5;border-radius:12px;color:#a6402a;padding:14px 20px;margin-bottom:20px;font-size:14px;">
             @foreach ($errors->all() as $message)
                 <div>{{ $message }}</div>
             @endforeach
@@ -72,7 +72,7 @@
             <span>Rp {{ number_format($order->shipping, 0, ',', '.') }}</span>
         </div>
 
-        <div style="display:flex;justify-content:space-between;padding-top:12px;border-top:1px solid #eee;color:#c4592f;font-size:20px;font-weight:bold;">
+        <div style="display:flex;justify-content:space-between;padding-top:12px;border-top:1px solid #eee;color:#0a7d9c;font-size:20px;font-weight:bold;">
             <span>Total</span>
             <span>Rp {{ number_format($order->total, 0, ',', '.') }}</span>
         </div>
