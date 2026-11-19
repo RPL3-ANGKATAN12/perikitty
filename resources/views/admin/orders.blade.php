@@ -50,11 +50,32 @@
         color: #261c22;
         outline: none;
     }
+    .ord-filter-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .ord-chip {
+        border: 1px solid #f0d7e5;
+        background: #fff9fc;
+        color: #5c4d55;
+        padding: 8px 13px;
+        border-radius: 999px;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .ord-chip.active {
+        background: #ffe0ef;
+        color: #a82b6a;
+        border-color: #f2b4d3;
+    }
     .ord-btn-csv {
         background: #fff5f9;
         color: #9e2f68;
         border: 1.5px solid #f2c4db;
-        padding: 10px 16px;
+        padding: 9px 15px;
         border-radius: 11px;
         font-weight: 700;
         font-size: 13px;
@@ -82,13 +103,17 @@
     table.ord-tbl tbody tr:hover { background: #fff9fc; }
     table.ord-tbl tbody td { padding: 15px 20px; font-size: 14px; color: #3b3036; }
     .ord-badge {
-        background: #e0f2fe;
-        color: #0369a1;
+        background: #dcfce7;
+        color: #166534;
         padding: 5px 12px;
         border-radius: 999px;
         font-size: 12px;
         font-weight: 700;
         display: inline-block;
+    }
+    .ord-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
     }
 </style>
 
@@ -96,17 +121,22 @@
     <div class="ord-hero">
         <div>
             <h1 class="ord-title">Data Transaksi &amp; Pesanan</h1>
-            <p class="ord-sub">Riwayat transaksi masuk pelanggan wilayah Batam</p>
+            <p class="ord-sub">Catatan pesanan yang masuk; penanganan lanjutan dilakukan melalui WhatsApp</p>
         </div>
         <div class="ord-summary-box">
-            Total Pesanan: <strong>{{ $orders->count() }}</strong> &bull;
-            Omzet: <strong style="color: #d44b8d;">Rp {{ number_format($orders->sum('total'), 0, ',', '.') }}</strong>
+            Total Tercatat: <strong>{{ $orders->count() }}</strong> &bull;
+            Total Nilai: <strong style="color: #d44b8d;">Rp {{ number_format($orders->sum('total'), 0, ',', '.') }}</strong>
         </div>
     </div>
 
     <div class="ord-toolbar">
         <input type="text" id="orderSearch" class="ord-search" placeholder="Cari no. pesanan, nama pemesan, atau alamat..." oninput="filterOrders()">
-        <button type="button" onclick="exportOrdersCsv()" class="ord-btn-csv">Export CSV</button>
+        <div class="ord-filter-group">
+            <button type="button" class="ord-chip active" onclick="setOrderFilter('all', this)">Semua</button>
+            <button type="button" class="ord-chip" onclick="setOrderFilter('pending', this)">Menunggu Kirim WA</button>
+            <button type="button" class="ord-chip" onclick="setOrderFilter('wa', this)">Dialihkan ke WA</button>
+            <button type="button" onclick="exportOrdersCsv()" class="ord-btn-csv">Unduh CSV</button>
+        </div>
     </div>
 
     <div class="ord-card">
@@ -122,7 +152,21 @@
             </thead>
             <tbody>
                 @forelse($orders as $order)
-                <tr class="order-row" data-search="{{ strtolower(($order->order_number ?? '') . ' ' . ($order->name ?? '') . ' ' . ($order->address ?? '') . ' ' . ($order->district ?? '')) }}" data-order="{{ $order->order_number }}" data-name="{{ $order->name }}" data-total="{{ $order->total }}" data-status="{{ $order->status }}">
+                @php
+                    $rawStatus = trim((string) ($order->status ?? ''));
+                    $stLower = strtolower($rawStatus);
+                    $isDraft = $rawStatus === '' || str_contains($stLower, 'draft') || str_contains($stLower, 'draf') || str_contains($stLower, 'belum') || str_contains($stLower, 'menunggu') || str_contains($stLower, 'pending');
+                    $displayStatus = (str_contains($stLower, 'proses') || $rawStatus === '')
+                        ? ($isDraft ? 'Menunggu Kirim WA' : 'Terkirim ke WA')
+                        : $rawStatus;
+                @endphp
+                <tr class="order-row"
+                    data-group="{{ $isDraft ? 'pending' : 'wa' }}"
+                    data-search="{{ strtolower(($order->order_number ?? '') . ' ' . ($order->name ?? '') . ' ' . ($order->address ?? '') . ' ' . ($order->district ?? '') . ' ' . $displayStatus) }}"
+                    data-order="{{ $order->order_number }}"
+                    data-name="{{ $order->name }}"
+                    data-total="{{ $order->total }}"
+                    data-status="{{ $displayStatus }}">
                     <td style="font-weight: 700; color: #261c22;">{{ $order->order_number }}</td>
                     <td>
                         <strong>{{ $order->name }}</strong><br>
@@ -135,10 +179,10 @@
                         <span style="color: #6b5b63;">{{ $order->address }}</span>
                     </td>
                     <td style="color: #d44b8d; font-weight: 800; white-space: nowrap;">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
-                    <td><span class="ord-badge">{{ $order->status }}</span></td>
+                    <td><span class="ord-badge {{ $isDraft ? 'pending' : '' }}">{{ $displayStatus }}</span></td>
                 </tr>
                 @empty
-                <tr><td colspan="5" style="padding: 36px; text-align: center; color: #8c7b84;">Belum ada pesanan masuk.</td></tr>
+                <tr><td colspan="5" style="padding: 36px; text-align: center; color: #8c7b84;">Belum ada pesanan tercatat.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -146,11 +190,21 @@
 </div>
 
 <script>
+    let orderGroupFilter = 'all';
+    function setOrderFilter(group, btn) {
+        orderGroupFilter = group;
+        document.querySelectorAll('.ord-chip').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        filterOrders();
+    }
     function filterOrders() {
         const q = (document.getElementById('orderSearch').value || '').toLowerCase().trim();
         document.querySelectorAll('.order-row').forEach(row => {
             const hay = row.dataset.search || '';
-            row.style.display = (!q || hay.includes(q)) ? '' : 'none';
+            const grp = row.dataset.group || 'wa';
+            const matchSearch = !q || hay.includes(q);
+            const matchGroup = orderGroupFilter === 'all' || grp === orderGroupFilter;
+            row.style.display = (matchSearch && matchGroup) ? '' : 'none';
         });
     }
     function exportOrdersCsv() {
