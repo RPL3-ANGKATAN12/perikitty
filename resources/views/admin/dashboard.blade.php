@@ -1,82 +1,158 @@
 ﻿@extends('layouts.admin')
 @section('content')
 <style>
-    .dm-wrap {
+    .dm-page {
         display: flex;
         flex-direction: column;
-        gap: 22px;
+        gap: 20px;
+        color: #2d2429;
     }
-    .dm-header {
+    .dm-hero {
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 14px;
-        background: linear-gradient(135deg, #fff5f9 0%, #ffffff 70%);
-        border: 1px solid #f3d5e4;
-        padding: 22px 26px;
-        border-radius: 16px;
-        box-shadow: 0 6px 20px rgba(216, 91, 155, 0.06);
+        gap: 16px;
+        background: linear-gradient(120deg, #fff5f9 0%, #fffaf7 55%, #ffffff 100%);
+        border: 1px solid #f7d8e8;
+        padding: 24px 28px;
+        border-radius: 20px;
+        box-shadow: 0 10px 28px rgba(224, 98, 160, 0.08);
+    }
+    .dm-badge-top {
+        display: inline-block;
+        background: #ffe4f1;
+        color: #b83b7a;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        padding: 5px 12px;
+        border-radius: 999px;
+        margin-bottom: 8px;
     }
     .dm-title {
         margin: 0;
-        font-size: 24px;
+        font-size: 25px;
         font-weight: 800;
-        color: #1e293b;
-        letter-spacing: -0.3px;
+        color: #261c22;
     }
-    .dm-subtitle {
-        margin: 4px 0 0;
+    .dm-sub {
+        margin: 5px 0 0;
+        font-size: 13.5px;
+        color: #6b5b63;
+    }
+    .dm-hero-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .dm-btn-csv {
+        background: #ffffff;
+        color: #8b2e5e;
+        border: 1.5px solid #f2c4db;
+        padding: 11px 16px;
+        border-radius: 12px;
+        font-weight: 700;
         font-size: 13px;
-        color: #64748b;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .dm-btn-csv:hover {
+        background: #fff0f7;
+        border-color: #e062a0;
     }
     .dm-btn-add {
-        background: linear-gradient(135deg, #d85b9b 0%, #be4282 100%);
-        color: #fff;
+        background: linear-gradient(135deg, #ec6ca8 0%, #d44b8d 100%);
+        color: #ffffff;
         padding: 12px 20px;
-        border-radius: 10px;
+        border-radius: 12px;
         text-decoration: none;
         font-weight: 700;
         font-size: 13px;
-        box-shadow: 0 8px 18px rgba(216, 91, 155, 0.25);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+        box-shadow: 0 8px 20px rgba(212, 75, 141, 0.25);
+        transition: transform 0.15s ease;
     }
     .dm-btn-add:hover {
         transform: translateY(-1px);
-        box-shadow: 0 10px 22px rgba(216, 91, 155, 0.32);
     }
     .dm-stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
         gap: 14px;
     }
-    .dm-stat-card {
+    .dm-stat {
         background: #ffffff;
-        border: 1px solid #f1e4ec;
-        border-radius: 14px;
-        padding: 16px 20px;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        border: 1px solid #f5e1ec;
+        border-radius: 16px;
+        padding: 18px 20px;
+        box-shadow: 0 6px 16px rgba(224, 98, 160, 0.05);
     }
     .dm-stat-label {
         font-size: 12px;
-        font-weight: 600;
-        color: #64748b;
+        font-weight: 700;
+        color: #7c6b73;
         text-transform: uppercase;
         letter-spacing: 0.4px;
     }
-    .dm-stat-value {
+    .dm-stat-val {
         margin-top: 6px;
-        font-size: 20px;
+        font-size: 21px;
         font-weight: 800;
-        color: #0f172a;
+        color: #261c22;
     }
-    .dm-stat-value.accent {
-        color: #be4282;
+    .dm-stat-val.rose { color: #d44b8d; }
+    .dm-stat-val.mint { color: #15803d; }
+
+    .dm-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: #ffffff;
+        border: 1px solid #f5e1ec;
+        padding: 14px 18px;
+        border-radius: 16px;
     }
-    .dm-alert-success {
+    .dm-search {
+        flex: 1;
+        min-width: 220px;
+        padding: 11px 16px;
+        border-radius: 11px;
+        border: 1.5px solid #f0d7e5;
+        background: #fffcfd;
+        font-size: 14px;
+        color: #261c22;
+        outline: none;
+    }
+    .dm-search:focus {
+        border-color: #e062a0;
+        background: #ffffff;
+    }
+    .dm-filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .dm-chip {
+        border: 1px solid #f0d7e5;
+        background: #fff9fc;
+        color: #5c4d55;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .dm-chip.active {
+        background: #ffe0ef;
+        color: #a82b6a;
+        border-color: #f2b4d3;
+    }
+    .dm-alert {
         background: #ecfdf5;
         color: #065f46;
         border: 1px solid #a7f3d0;
@@ -85,192 +161,248 @@
         font-weight: 600;
         font-size: 14px;
     }
-    .dm-card {
+    .dm-table-wrap {
         background: #ffffff;
-        border-radius: 16px;
-        border: 1px solid #f1e4ec;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+        border-radius: 18px;
+        border: 1px solid #f5e1ec;
+        box-shadow: 0 10px 26px rgba(224, 98, 160, 0.06);
         overflow-x: auto;
     }
-    .dm-table {
+    table.dm-tbl {
         width: 100%;
         border-collapse: collapse;
         text-align: left;
     }
-    .dm-table thead th {
-        background: #fdf2f8;
-        color: #831843;
+    table.dm-tbl thead th {
+        background: #fff2f8;
+        color: #8c2d5e;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         padding: 15px 20px;
-        border-bottom: 1px solid #f3d5e4;
+        border-bottom: 1px solid #f5d6e6;
     }
-    .dm-table tbody tr {
-        border-bottom: 1px solid #f8fafc;
+    table.dm-tbl tbody tr {
+        border-bottom: 1px solid #fdf2f7;
         transition: background 0.15s ease;
     }
-    .dm-table tbody tr:hover {
+    table.dm-tbl tbody tr:hover {
         background: #fff9fc;
     }
-    .dm-table tbody tr:last-child {
-        border-bottom: none;
-    }
-    .dm-table tbody td {
+    table.dm-tbl tbody td {
         padding: 14px 20px;
         font-size: 14px;
-        color: #334155;
+        color: #3b3036;
         vertical-align: middle;
     }
-    .dm-thumb {
-        width: 54px;
-        height: 54px;
-        border-radius: 10px;
+    .dm-img {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
         overflow: hidden;
-        border: 1px solid #f1e4ec;
-        background: #fdf2f8;
+        border: 1.5px solid #f5d6e6;
+        background: #fff5f9;
     }
-    .dm-thumb img {
+    .dm-img img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
     }
-    .dm-prod-name {
+    .dm-name {
         font-weight: 700;
-        color: #0f172a;
+        color: #261c22;
+        font-size: 14.5px;
     }
     .dm-price {
         font-weight: 800;
-        color: #be4282;
+        color: #c93b82;
         white-space: nowrap;
     }
-    .dm-stock-pill {
+    .pill {
         display: inline-block;
-        padding: 4px 10px;
+        padding: 5px 12px;
         border-radius: 999px;
         font-size: 12px;
         font-weight: 700;
-        background: #f1f5f9;
-        color: #0f172a;
     }
-    .dm-stock-pill.empty {
-        background: #fee2e2;
-        color: #b91c1c;
-    }
-    .dm-actions {
+    .pill.ok { background: #dcfce7; color: #166534; }
+    .pill.low { background: #fef3c7; color: #92400e; }
+    .pill.out { background: #ffe4e6; color: #be123c; }
+
+    .dm-act {
         display: flex;
-        align-items: center;
         gap: 8px;
+        align-items: center;
     }
-    .dm-btn-edit {
-        background: #fef3c7;
-        color: #92400e;
-        border: 1px solid #fde68a;
+    .btn-edit {
+        background: #fff7ed;
+        color: #9a3412;
+        border: 1px solid #fed7aa;
         padding: 7px 14px;
-        border-radius: 8px;
+        border-radius: 9px;
         text-decoration: none;
         font-weight: 700;
         font-size: 12px;
-        transition: background 0.15s ease;
     }
-    .dm-btn-edit:hover {
-        background: #fde68a;
-    }
-    .dm-btn-del {
-        background: #ffe4e6;
+    .btn-edit:hover { background: #ffedd5; }
+    .btn-del {
+        background: #fff1f2;
         color: #be123c;
         border: 1px solid #fecdd3;
         padding: 7px 14px;
-        border-radius: 8px;
+        border-radius: 9px;
         cursor: pointer;
         font-weight: 700;
         font-size: 12px;
-        transition: background 0.15s ease;
     }
-    .dm-btn-del:hover {
-        background: #fecdd3;
-    }
-    .dm-empty {
-        padding: 36px 20px;
-        text-align: center;
-        color: #94a3b8;
-        font-size: 14px;
-    }
+    .btn-del:hover { background: #ffe4e6; }
 </style>
 
-<div class="dm-wrap">
-    <div class="dm-header">
+<div class="dm-page">
+    <div class="dm-hero">
         <div>
-            <h1 class="dm-title">Data Produk (Tabel Master)</h1>
-            <p class="dm-subtitle">Kelola katalog produk, harga, dan stok toko Perikitty</p>
+            <span class="dm-badge-top">Perikitty Catalog &amp; Master</span>
+            <h1 class="dm-title">Data Master Produk</h1>
+            <p class="dm-sub">Kelola daftar produk, pantau ketersediaan stok, dan ekspor data katalog</p>
         </div>
-        <a href="{{ route('admin.create') }}" class="dm-btn-add">+ Tambah Produk</a>
+        <div class="dm-hero-actions">
+            <button type="button" onclick="exportCatalogCsv()" class="dm-btn-csv">Export CSV</button>
+            <a href="{{ route('admin.create') }}" class="dm-btn-add">+ Tambah Produk</a>
+        </div>
     </div>
 
     @if(session('success'))
-        <div class="dm-alert-success">{{ session('success') }}</div>
+        <div class="dm-alert">{{ session('success') }}</div>
     @endif
 
+    @php
+        $totalProducts = $products->count();
+        $totalStock = $products->sum('stock');
+        $lowStockCount = $products->where('stock', '>', 0)->where('stock', '<=', 5)->count();
+        $catalogValue = $products->sum(fn($item) => $item->price * $item->stock);
+    @endphp
+
     <div class="dm-stats">
-        <div class="dm-stat-card">
+        <div class="dm-stat">
             <div class="dm-stat-label">Total Produk</div>
-            <div class="dm-stat-value">{{ $products->count() }} Item</div>
+            <div class="dm-stat-val">{{ $totalProducts }} Item</div>
         </div>
-        <div class="dm-stat-card">
-            <div class="dm-stat-label">Total Unit Stok</div>
-            <div class="dm-stat-value">{{ $products->sum('stock') }} Pcs</div>
+        <div class="dm-stat">
+            <div class="dm-stat-label">Total Stok Aktif</div>
+            <div class="dm-stat-val mint">{{ $totalStock }} Unit</div>
         </div>
-        <div class="dm-stat-card">
-            <div class="dm-stat-label">Estimasi Nilai Stok</div>
-            <div class="dm-stat-value accent">Rp {{ number_format($products->sum(fn($item) => $item->price * $item->stock), 0, ',', '.') }}</div>
+        <div class="dm-stat">
+            <div class="dm-stat-label">Stok Menipis (&le; 5)</div>
+            <div class="dm-stat-val rose">{{ $lowStockCount }} Produk</div>
+        </div>
+        <div class="dm-stat">
+            <div class="dm-stat-label">Nilai Katalog</div>
+            <div class="dm-stat-val rose">Rp {{ number_format($catalogValue, 0, ',', '.') }}</div>
         </div>
     </div>
 
-    <div class="dm-card">
-        <table class="dm-table">
+    <div class="dm-toolbar">
+        <input type="text" id="searchInput" class="dm-search" placeholder="Cari nama produk..." oninput="applyFilter()">
+        <div class="dm-filters">
+            <button type="button" class="dm-chip active" data-filter="all" onclick="setFilter('all', this)">Semua</button>
+            <button type="button" class="dm-chip" data-filter="ok" onclick="setFilter('ok', this)">Tersedia</button>
+            <button type="button" class="dm-chip" data-filter="low" onclick="setFilter('low', this)">Menipis</button>
+            <button type="button" class="dm-chip" data-filter="out" onclick="setFilter('out', this)">Habis</button>
+        </div>
+    </div>
+
+    <div class="dm-table-wrap">
+        <table class="dm-tbl" id="catalogTable">
             <thead>
                 <tr>
                     <th>Foto</th>
                     <th>Nama Produk</th>
                     <th>Harga</th>
-                    <th>Stok</th>
+                    <th>Stok &amp; Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($products as $p)
-                @php $imgs = json_decode($p->images ?? '[]', true) ?: []; @endphp
-                <tr>
+                @php
+                    $imgs = json_decode($p->images ?? '[]', true) ?: [];
+                    $statusKey = $p->stock <= 0 ? 'out' : ($p->stock <= 5 ? 'low' : 'ok');
+                @endphp
+                <tr class="product-row" data-name="{{ strtolower($p->name) }}" data-status="{{ $statusKey }}" data-price="{{ $p->price }}" data-stock="{{ $p->stock }}">
                     <td>
-                        <div class="dm-thumb">
+                        <div class="dm-img">
                             <img src="{{ isset($imgs[0]) ? asset('storage/' . $imgs[0]) : asset('images/produk1.jpg') }}" alt="{{ $p->name }}">
                         </div>
                     </td>
-                    <td class="dm-prod-name">{{ $p->name }}</td>
+                    <td class="dm-name">{{ $p->name }}</td>
                     <td class="dm-price">Rp {{ number_format($p->price, 0, ',', '.') }}</td>
                     <td>
-                        <span class="dm-stock-pill {{ $p->stock <= 0 ? 'empty' : '' }}">
-                            {{ $p->stock > 0 ? $p->stock . ' tersedia' : 'Habis' }}
-                        </span>
+                        @if($p->stock <= 0)
+                            <span class="pill out">Habis (0)</span>
+                        @elseif($p->stock <= 5)
+                            <span class="pill low">Menipis ({{ $p->stock }})</span>
+                        @else
+                            <span class="pill ok">Tersedia ({{ $p->stock }})</span>
+                        @endif
                     </td>
                     <td>
-                        <div class="dm-actions">
-                            <a href="{{ route('admin.edit', $p->id) }}" class="dm-btn-edit">Edit</a>
+                        <div class="dm-act">
+                            <a href="{{ route('admin.edit', $p->id) }}" class="btn-edit">Edit</a>
                             <form action="{{ route('admin.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus produk ini?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="dm-btn-del">Hapus</button>
+                                <button type="submit" class="btn-del">Hapus</button>
                             </form>
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="dm-empty">Belum ada produk pada data master.</td></tr>
+                <tr><td colspan="5" style="padding: 36px; text-align: center; color: #8c7b84;">Belum ada data produk.</td></tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    let activeFilter = 'all';
+    function setFilter(filter, btn) {
+        activeFilter = filter;
+        document.querySelectorAll('.dm-chip').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilter();
+    }
+    function applyFilter() {
+        const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+        document.querySelectorAll('.product-row').forEach(row => {
+            const name = row.dataset.name || '';
+            const status = row.dataset.status || '';
+            const matchText = !q || name.includes(q);
+            const matchStatus = activeFilter === 'all' || status === activeFilter;
+            row.style.display = (matchText && matchStatus) ? '' : 'none';
+        });
+    }
+    function exportCatalogCsv() {
+        const rows = [['Nama Produk', 'Harga', 'Stok', 'Status']];
+        document.querySelectorAll('.product-row').forEach(row => {
+            if (row.style.display === 'none') return;
+            rows.push([
+                row.querySelector('.dm-name').innerText.trim(),
+                row.dataset.price,
+                row.dataset.stock,
+                row.dataset.status
+            ]);
+        });
+        const csv = rows.map(r => r.map(v => '"' + String(v).replaceAll('"', '""') + '"').join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data-master-produk-perikitty.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
 @endsection

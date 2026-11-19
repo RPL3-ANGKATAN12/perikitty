@@ -1,44 +1,172 @@
 ﻿@extends('layouts.admin')
 @section('content')
-    <div class="header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+<style>
+    .ord-page {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        color: #2d2429;
+    }
+    .ord-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        background: linear-gradient(120deg, #fff5f9 0%, #fffaf7 60%, #ffffff 100%);
+        border: 1px solid #f7d8e8;
+        padding: 24px 28px;
+        border-radius: 20px;
+        box-shadow: 0 10px 28px rgba(224, 98, 160, 0.08);
+    }
+    .ord-title { margin: 0; font-size: 25px; font-weight: 800; color: #261c22; }
+    .ord-sub { margin: 4px 0 0; font-size: 13.5px; color: #6b5b63; }
+    .ord-summary-box {
+        background: #ffffff;
+        border: 1.5px solid #f3d5e4;
+        padding: 12px 18px;
+        border-radius: 14px;
+        font-size: 13.5px;
+    }
+    .ord-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: #ffffff;
+        border: 1px solid #f5e1ec;
+        padding: 14px 18px;
+        border-radius: 16px;
+    }
+    .ord-search {
+        flex: 1;
+        min-width: 220px;
+        padding: 11px 16px;
+        border-radius: 11px;
+        border: 1.5px solid #f0d7e5;
+        background: #fffcfd;
+        font-size: 14px;
+        color: #261c22;
+        outline: none;
+    }
+    .ord-btn-csv {
+        background: #fff5f9;
+        color: #9e2f68;
+        border: 1.5px solid #f2c4db;
+        padding: 10px 16px;
+        border-radius: 11px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    .ord-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid #f5e1ec;
+        box-shadow: 0 10px 26px rgba(224, 98, 160, 0.06);
+        overflow-x: auto;
+    }
+    table.ord-tbl { width: 100%; border-collapse: collapse; text-align: left; }
+    table.ord-tbl thead th {
+        background: #fff2f8;
+        color: #8c2d5e;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 15px 20px;
+        border-bottom: 1px solid #f5d6e6;
+    }
+    table.ord-tbl tbody tr { border-bottom: 1px solid #fdf2f7; }
+    table.ord-tbl tbody tr:hover { background: #fff9fc; }
+    table.ord-tbl tbody td { padding: 15px 20px; font-size: 14px; color: #3b3036; }
+    .ord-badge {
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-block;
+    }
+</style>
+
+<div class="ord-page">
+    <div class="ord-hero">
         <div>
-            <h1>Data Pesanan (Tabel Transaksi)</h1>
-            <p style="color: #64748b; font-size: 14px; margin-top: 4px;">Rekap transaksi masuk pelanggan Perikitty</p>
+            <h1 class="ord-title">Data Transaksi &amp; Pesanan</h1>
+            <p class="ord-sub">Riwayat transaksi masuk pelanggan wilayah Batam</p>
         </div>
-        <div style="background: #fdf2f8; border: 1px solid var(--border); padding: 12px 18px; border-radius: 10px; font-size: 14px;">
-            Total Transaksi: <strong>{{ $orders->count() }}</strong> | Total Nilai: <strong style="color: var(--accent);">Rp {{ number_format($orders->sum('total'), 0, ',', '.') }}</strong>
+        <div class="ord-summary-box">
+            Total Pesanan: <strong>{{ $orders->count() }}</strong> &bull;
+            Omzet: <strong style="color: #d44b8d;">Rp {{ number_format($orders->sum('total'), 0, ',', '.') }}</strong>
         </div>
     </div>
 
-    <div style="background: #fff; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid var(--border);">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead style="background: #fdf2f8; color: #64748b; font-size: 13px; border-bottom: 1px solid var(--border);">
+    <div class="ord-toolbar">
+        <input type="text" id="orderSearch" class="ord-search" placeholder="Cari no. pesanan, nama pemesan, atau alamat..." oninput="filterOrders()">
+        <button type="button" onclick="exportOrdersCsv()" class="ord-btn-csv">Export CSV</button>
+    </div>
+
+    <div class="ord-card">
+        <table class="ord-tbl" id="ordersTable">
+            <thead>
                 <tr>
-                    <th style="padding: 16px 24px;">No. Pesanan</th>
-                    <th style="padding: 16px 24px;">Pemesan</th>
-                    <th style="padding: 16px 24px;">Tujuan</th>
-                    <th style="padding: 16px 24px;">Total</th>
-                    <th style="padding: 16px 24px;">Status</th>
+                    <th>No. Pesanan</th>
+                    <th>Pemesan</th>
+                    <th>Tujuan Pengiriman</th>
+                    <th>Total</th>
+                    <th>Status</th>
                 </tr>
             </thead>
-            <tbody style="font-size: 14px;">
+            <tbody>
                 @forelse($orders as $order)
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 16px 24px; font-weight: 600; color: #0f172a;">{{ $order->order_number }}</td>
-                    <td style="padding: 16px 24px;">{{ $order->name }}<br><span style="font-size: 12px; color: #64748b;">{{ $order->phone ?? '-' }}</span></td>
-                    <td style="padding: 16px 24px; font-size: 13px;">
-                        @if(!empty($order->district))
-                            {{ $order->village }}, {{ $order->district }}<br>
-                        @endif
-                        <span style="color: #64748b;">{{ $order->address }}</span>
+                <tr class="order-row" data-search="{{ strtolower(($order->order_number ?? '') . ' ' . ($order->name ?? '') . ' ' . ($order->address ?? '') . ' ' . ($order->district ?? '')) }}" data-order="{{ $order->order_number }}" data-name="{{ $order->name }}" data-total="{{ $order->total }}" data-status="{{ $order->status }}">
+                    <td style="font-weight: 700; color: #261c22;">{{ $order->order_number }}</td>
+                    <td>
+                        <strong>{{ $order->name }}</strong><br>
+                        <span style="font-size: 12px; color: #7c6b73;">{{ $order->phone ?? '-' }}</span>
                     </td>
-                    <td style="padding: 16px 24px; color: var(--accent); font-weight: 700;">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
-                    <td style="padding: 16px 24px;"><span style="background: #e0f2fe; color: #0284c7; padding: 5px 12px; border-radius: 100px; font-size: 12px; font-weight: 700;">{{ $order->status }}</span></td>
+                    <td style="font-size: 13px;">
+                        @if(!empty($order->district))
+                            <strong>{{ $order->village }}, {{ $order->district }}</strong><br>
+                        @endif
+                        <span style="color: #6b5b63;">{{ $order->address }}</span>
+                    </td>
+                    <td style="color: #d44b8d; font-weight: 800; white-space: nowrap;">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
+                    <td><span class="ord-badge">{{ $order->status }}</span></td>
                 </tr>
                 @empty
-                <tr><td colspan="5" style="padding: 28px; text-align: center; color: #888;">Belum ada pesanan masuk.</td></tr>
+                <tr><td colspan="5" style="padding: 36px; text-align: center; color: #8c7b84;">Belum ada pesanan masuk.</td></tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+</div>
+
+<script>
+    function filterOrders() {
+        const q = (document.getElementById('orderSearch').value || '').toLowerCase().trim();
+        document.querySelectorAll('.order-row').forEach(row => {
+            const hay = row.dataset.search || '';
+            row.style.display = (!q || hay.includes(q)) ? '' : 'none';
+        });
+    }
+    function exportOrdersCsv() {
+        const rows = [['No Pesanan', 'Pemesan', 'Total', 'Status']];
+        document.querySelectorAll('.order-row').forEach(row => {
+            if (row.style.display === 'none') return;
+            rows.push([row.dataset.order, row.dataset.name, row.dataset.total, row.dataset.status]);
+        });
+        const csv = rows.map(r => r.map(v => '"' + String(v).replaceAll('"', '""') + '"').join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data-transaksi-perikitty.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
 @endsection
