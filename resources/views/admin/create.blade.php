@@ -1,19 +1,22 @@
-﻿@extends('layouts.app')
-@section('title', 'Tambah Produk - Perikitty')
+@extends('layouts.admin')
 @section('content')
-<section style="padding: 60px 5%; background: var(--bg); min-height: 80vh; display: flex; justify-content: center;">
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 40px; width: 100%; max-width: 600px;">
-        <h1 style="font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 24px;">Tambah Produk Baru</h1>
-        <form action="{{ route('admin.store') }}" method="POST">
+    <div class="header">
+        <h1>Tambah Produk Baru</h1>
+        <a href="{{ route('admin.dashboard') }}" style="color: #666; text-decoration: none; font-weight: 600;">&larr; Kembali</a>
+    </div>
+    <div style="background: #fff; padding: 30px; border-radius: 12px; max-width: 700px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0;">
+        <form action="{{ route('admin.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div style="margin-bottom: 16px;"><label style="color: var(--text-muted); font-size: 14px;">Nama Produk</label><input type="text" name="name" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);"></div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-                <div><label style="color: var(--text-muted); font-size: 14px;">Harga (Rp)</label><input type="number" name="price" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);"></div>
-                <div><label style="color: var(--text-muted); font-size: 14px;">Stok</label><input type="number" name="stock" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);"></div>
+            <div style="margin-bottom: 20px;"><label style="display:block; margin-bottom:8px; font-weight:600;">Nama Produk</label><input type="text" name="name" required style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                <div><label style="display:block; margin-bottom:8px; font-weight:600;">Harga</label><input type="number" name="price" required style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;"></div>
+                <div><label style="display:block; margin-bottom:8px; font-weight:600;">Stok</label><input type="number" name="stock" required style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;"></div>
+                <div><label style="display:block; margin-bottom:8px; font-weight:600;">Kategori</label><select name="category_id" required style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;">@foreach($categories as $cat)<option value="{{ $cat->id }}">{{ $cat->name }}</option>@endforeach</select></div>
             </div>
-            <div style="margin-bottom: 24px;"><label style="color: var(--text-muted); font-size: 14px;">Deskripsi</label><textarea name="description" rows="4" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);"></textarea></div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px;">Simpan Produk</button>
+            <div style="margin-bottom: 20px;"><label style="display:block; margin-bottom:8px; font-weight:600;">Deskripsi</label><textarea name="description" rows="4" required style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;"></textarea></div>
+            <div style="margin-bottom: 20px;"><label style="display:block; margin-bottom:8px; font-weight:600;">Upload Banyak Foto</label><input type="file" name="images[]" multiple accept="image/*" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;"></div>
+            <div style="margin-bottom: 30px;"><label style="display:block; margin-bottom:8px; font-weight:600;">Upload Video (Opsional)</label><input type="file" name="video" accept="video/*" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;"></div>
+            <button type="submit" style="background: #d85b9b; color: #fff; padding: 16px 32px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%;">Simpan Produk</button>
         </form>
     </div>
-</section>
 @endsection

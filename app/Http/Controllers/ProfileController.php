@@ -1,38 +1,18 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
+use App\Models\Order;
 
 class ProfileController extends Controller
 {
-    public function edit(Request $request): View
+    public function index()
     {
-        return view('profile.edit', ['user' => $request->user()]);
+        $orders = Order::where('user_id', auth()->id())->latest()->get();
+        return view('profile.index', compact('orders'));
     }
 
-    public function update(Request $request): RedirectResponse
+    public function show($id)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'phone' => ['required', 'string', 'regex:/^(\+62|62|0)8[0-9]{8,12}$/'],
-            'address' => ['required', 'string', 'max:500'],
-        ], [
-            'phone.regex' => 'Nomor HP tidak valid. Contoh: 081234567890.',
-        ]);
-
-        $request->user()->update([
-            'name' => $validated['name'],
-            'phone' => $validated['phone'],
-            'address' => $validated['address'],
-            'city' => 'Batam',
-            'province' => 'Kepulauan Riau',
-        ]);
-
-        return redirect()
-            ->route('profile.edit')
-            ->with('success', 'Profil berhasil diperbarui.');
+        $order = Order::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+        return view('profile.show', compact('order'));
     }
 }

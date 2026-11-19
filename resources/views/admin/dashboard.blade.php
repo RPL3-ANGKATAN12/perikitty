@@ -1,63 +1,36 @@
-@extends('layouts.app')
-@section('title', 'Admin - Perikitty')
+@extends('layouts.admin')
 @section('content')
-<section style="padding: 60px 8%; min-height: 80vh;">
-    <h1 style="font-size: 36px; margin-bottom: 40px;">Dashboard Admin</h1>
-    
-    {{-- DATA MASTER (PRODUK) --}}
-    <div style="margin-bottom: 60px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="font-size: 24px;">Data Master (Produk)</h2>
-            <a href="{{ route('admin.create') }}" class="btn btn-primary">+ Tambah Produk</a>
-        </div>
-        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <thead style="background: var(--surface); color: var(--text-muted); font-size: 13px;">
-                    <tr><th style="padding: 16px 24px;">Nama Produk</th><th style="padding: 16px 24px;">Harga</th><th style="padding: 16px 24px;">Stok</th><th style="padding: 16px 24px;">Aksi</th></tr>
-                </thead>
-                <tbody style="font-size: 14px;">
-                    @forelse($products as $p)
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 16px 24px; font-weight: 600;">{{ $p->name }}</td>
-                        <td style="padding: 16px 24px; color: var(--accent); font-weight: 700;">Rp {{ number_format($p->price, 0, ',', '.') }}</td>
-                        <td style="padding: 16px 24px;">{{ $p->stock }}</td>
-                        <td style="padding: 16px 24px;">
-                            <form action="{{ route('admin.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus produk ini?');">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-color: #ef4444; color: #ef4444;">Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="4" style="padding: 24px; text-align: center;">Belum ada produk.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+    <div class="header">
+        <h1>Data Produk (Tabel Master)</h1>
+        <a href="{{ route('admin.create') }}" style="background: var(--accent); color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">+ Tambah Produk</a>
     </div>
 
-    {{-- DATA TRANSAKSI (PESANAN) --}}
-    <div>
-        <h2 style="font-size: 24px; margin-bottom: 20px;">Data Transaksi (Pesanan Masuk)</h2>
-        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <thead style="background: var(--surface); color: var(--text-muted); font-size: 13px;">
-                    <tr><th style="padding: 16px 24px;">No. Pesanan</th><th style="padding: 16px 24px;">Nama</th><th style="padding: 16px 24px;">Total</th><th style="padding: 16px 24px;">Status</th></tr>
-                </thead>
-                <tbody style="font-size: 14px;">
-                    @forelse($orders as $o)
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 16px 24px; font-weight: 600;">{{ $o->order_number }}</td>
-                        <td style="padding: 16px 24px;">{{ $o->name }}</td>
-                        <td style="padding: 16px 24px; color: var(--accent); font-weight: 700;">Rp {{ number_format($o->total, 0, ',', '.') }}</td>
-                        <td style="padding: 16px 24px;"><span style="background: rgba(216, 91, 155, 0.1); color: var(--accent); padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 700;">{{ $o->status }}</span></td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="4" style="padding: 24px; text-align: center;">Belum ada pesanan.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+    @if(session('success'))
+        <div style="background: #dcfce7; color: #166534; padding: 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 600;">{{ session('success') }}</div>
+    @endif
+
+    <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid var(--border);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: #f8fafc; color: #64748b; font-size: 13px; border-bottom: 1px solid var(--border);">
+                <tr><th style="padding: 16px 24px;">Foto</th><th style="padding: 16px 24px;">Nama Produk</th><th style="padding: 16px 24px;">Harga</th><th style="padding: 16px 24px;">Stok</th><th style="padding: 16px 24px;">Aksi</th></tr>
+            </thead>
+            <tbody style="font-size: 14px;">
+                @forelse($products as $p)
+                @php $imgs = json_decode($p->images ?? '[]', true) ?: []; @endphp
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 16px 24px;"><div style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden;"><img src="{{ isset($imgs[0]) ? asset('storage/' . $imgs[0]) : asset('images/produk1.jpg') }}" style="width: 100%; height: 100%; object-fit: cover;"></div></td>
+                    <td style="padding: 16px 24px; font-weight: 600; color: #0f172a;">{{ $p->name }}</td>
+                    <td style="padding: 16px 24px; font-weight: 700;">Rp {{ number_format($p->price, 0, ',', '.') }}</td>
+                    <td style="padding: 16px 24px;">{{ $p->stock }}</td>
+                    <td style="padding: 16px 24px; display: flex; gap: 8px;">
+                        <a href="{{ route('admin.edit', $p->id) }}" style="background: #eab308; color: #fff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 12px;">Edit</a>
+                        <form action="{{ route('admin.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus produk ini?');">@csrf @method('DELETE') <button type="submit" style="background: #ef4444; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px;">Hapus</button></form>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="5" style="padding: 24px; text-align: center; color: #888;">Belum ada produk.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
-</section>
 @endsection

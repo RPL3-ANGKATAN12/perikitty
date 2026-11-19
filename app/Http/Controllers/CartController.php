@@ -1,109 +1,53 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use App\Models\Product;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use App\Models\Product;
 
 class CartController extends Controller
 {
-    public function index(Request $request): View
+    public function index()
     {
-        $cart = $request->session()->get('cart', []);
-
-        $subtotal = collect($cart)->sum(
-            fn (array $item): int => $item['price'] * $item['quantity']
-        );
-
-        return view('cart.index', compact('cart', 'subtotal'));
+        $cart = session()->get('cart', []);
+        $total = 0;
+        foreach($cart as $item) { $total += $item['price'] * $item['qty']; }
+        return view('cart.index', compact('cart', 'total'));
     }
 
-    public function add(Request $request, Product $product): RedirectResponse
+    public function add(Request $request, $id)
     {
-        if (! $product->is_active) {
-            abort(404);
-        }
+        $product = Product::findOrFail($id);
+        $cart = session()->get('cart', []);
 
-        if ($product->stock < 1) {
-            return back()->with('error', 'Produk sedang habis.');
-        }
-
-        $cart = $request->session()->get('cart', []);
-
-        $productId = $product->id;
-
-        if (isset($cart[$productId])) {
-            if ($cart[$productId]['quantity'] >= $product->stock) {
-                return back()->with('error', 'Jumlah melebihi stok yang tersedia.');
-            }
-
-            $cart[$productId]['quantity']++;
+        if(isset($cart[$id])) {
+            $cart[$id]['qty']++;
         } else {
-            $cart[$productId] = [
-                'id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'image' => $product->image,
-                'quantity' => 1,
+            $cart[$id] = [
+                "name" => $product->name,
+                "qty" => 1,
+                "price" => $product->price,
+                "image" => $product->images ? json_decode($product->images)[0] : 'produk1.jpg'
             ];
         }
-
-        $request->session()->put('cart', $cart);
-
-        return redirect()
-            ->route('cart.index')
-            ->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+        session()->put('cart', $cart);
+        return redirect()->route('cart.index')->with('success', 'Produk masuk keranjang!');
     }
 
-    public function update(Request $request, Product $product): RedirectResponse
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'quantity' => ['required', 'integer', 'min:0'],
-        ]);
-
-        $cart = $request->session()->get('cart', []);
-
-        if (! isset($cart[$product->id])) {
-            return back();
+        $cart = session()->get('cart', []);
+        if($request->action == 'increase') {
+            $cart[$id]['qty']++;
+        } elseif($request->action == 'decrease' && $cart[$id]['qty'] > 1) {
+            $cart[$id]['qty']--;
         }
-
-        $quantity = $validated['quantity'];
-
-        if ($quantity < 1) {
-            unset($cart[$product->id]);
-            $request->session()->put('cart', $cart);
-
-            return back()->with('success', 'Produk dihapus dari keranjang.');
-        }
-
-        if ($quantity > $product->stock) {
-            return back()->with('error', 'Jumlah melebihi stok yang tersedia.');
-        }
-
-        $cart[$product->id]['quantity'] = $quantity;
-
-        $request->session()->put('cart', $cart);
-
-        return back()->with('success', 'Jumlah produk diperbarui.');
+        session()->put('cart', $cart);
+        return redirect()->route('cart.index');
     }
 
-    public function remove(Request $request, Product $product): RedirectResponse
+    public function remove($id)
     {
-        $cart = $request->session()->get('cart', []);
-
-        unset($cart[$product->id]);
-
-        $request->session()->put('cart', $cart);
-
-        return back()->with('success', 'Produk dihapus dari keranjang.');
-    }
-
-    public function clear(Request $request): RedirectResponse
-    {
-        $request->session()->forget('cart');
-
-        return back()->with('success', 'Keranjang berhasil dikosongkan.');
+        $cart = session()->get('cart', []);
+        if(isset($cart[$id])) { unset($cart[$id]); session()->put('cart', $cart); }
+        return redirect()->route('cart.index')->with('success', 'Produk dihapus.');
     }
 }

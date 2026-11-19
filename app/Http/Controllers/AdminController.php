@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
@@ -12,35 +10,49 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $products = Product::all();
-        $orders = Order::latest()->get();
-        return view('admin.dashboard', compact('products', 'orders'));
+        $products = Product::latest()->get();
+        return view('admin.dashboard', compact('products'));
     }
 
-    public function create()
+    public function orders()
     {
-        $categories = Category::all();
-        return view('admin.create', compact('categories'));
+        $orders = Order::latest()->get();
+        return view('admin.orders', compact('orders'));
     }
+
+    public function create() { $categories = Category::all(); return view('admin.create', compact('categories')); }
 
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required', 'price' => 'required|numeric', 'stock' => 'required|numeric', 'description' => 'required']);
-        Product::create([
-            'name' => $request->name,
-            'slug' => Str::slug($request->name) . '-' . time(),
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'description' => $request->description,
-            'category_id' => $request->category_id ?? 1,
-            'is_active' => 1
-        ]);
+        $request->validate(['name' => 'required', 'price' => 'required|numeric', 'stock' => 'required|numeric', 'description' => 'required', 'category_id' => 'required']);
+        $data = $request->all();
+        $data['slug'] = Str::slug($request->name) . '-' . time();
+        $data['is_active'] = 1;
+        if ($request->hasFile('images')) {
+            $imagePaths = [];
+            foreach ($request->file('images') as $image) { $imagePaths[] = $image->store('products', 'public'); }
+            $data['images'] = json_encode($imagePaths);
+        }
+        if ($request->hasFile('video')) { $data['video'] = $request->file('video')->store('products', 'public'); }
+        Product::create($data);
         return redirect()->route('admin.dashboard')->with('success', 'Produk berhasil ditambahkan!');
     }
 
-    public function destroy($id)
+    public function edit($id) { $product = Product::findOrFail($id); $categories = Category::all(); return view('admin.edit', compact('product', 'categories')); }
+
+    public function update(Request $request, $id)
     {
-        Product::findOrFail($id)->delete();
-        return redirect()->route('admin.dashboard')->with('success', 'Produk berhasil dihapus!');
+        $product = Product::findOrFail($id);
+        $data = $request->all();
+        if ($request->hasFile('images')) {
+            $imagePaths = [];
+            foreach ($request->file('images') as $image) { $imagePaths[] = $image->store('products', 'public'); }
+            $data['images'] = json_encode($imagePaths);
+        }
+        if ($request->hasFile('video')) { $data['video'] = $request->file('video')->store('products', 'public'); }
+        $product->update($data);
+        return redirect()->route('admin.dashboard')->with('success', 'Produk berhasil diupdate!');
     }
+
+    public function destroy($id) { Product::findOrFail($id)->delete(); return redirect()->route('admin.dashboard')->with('success', 'Produk berhasil dihapus!'); }
 }

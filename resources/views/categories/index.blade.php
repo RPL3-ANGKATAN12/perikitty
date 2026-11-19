@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Kategori - Perikitty')
 @section('content')
 <section style="padding: 60px 5%; background: var(--bg); min-height: 80vh;">

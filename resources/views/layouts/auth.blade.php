@@ -1,44 +1,81 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Auth - Perikitty')</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0a3d4c; --surface: #0f4a5c; --text: #f0f7f8; --text-muted: #a3c9d1; --accent: #2dd4bf; --border: #156b82; }
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+        :root {
+            --bg: #ffffff;
+            --surface: #faf7f9;
+            --text: #2d2d2d;
+            --text-muted: #7a7a7a;
+            --accent: #d85b9b;
+            --border: #f0e5eb;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
         
-        /* Layout Split Screen */
-        .auth-container { display: flex; width: 100%; min-height: 100vh; }
-        .auth-left { flex: 1; background: linear-gradient(135deg, #0a3d4c 0%, #156b82 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
-        .auth-left h2 { font-size: 36px; margin-bottom: 16px; color: #fff; }
-        .auth-left p { color: #a3c9d1; font-size: 16px; max-width: 400px; }
+        .auth-container { display: flex; width: 100%; }
         
-        .auth-right { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--bg); }
-        .auth-box { width: 100%; max-width: 380px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        /* KIRI: Abstract Gradient (Bukan gambar, jadi pasti muncul!) */
+        .auth-left { 
+            flex: 0 0 45%; 
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%);
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 60px; 
+            text-align: center;
+            border-right: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
         
-        .logo { text-align: center; margin-bottom: 24px; font-size: 24px; font-weight: 800; }
+        /* Aksen lingkaran elegan di background */
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 300px;
+            height: 300px;
+            background: rgba(216, 91, 155, 0.1);
+            border-radius: 50%;
+            filter: blur(40px);
+        }
+        
+        .auth-left h2 { font-family: 'Playfair Display', serif; font-size: 52px; color: var(--accent); margin-bottom: 20px; letter-spacing: -1px; z-index: 2; }
+        .auth-left p { color: var(--text-muted); font-size: 16px; max-width: 340px; line-height: 1.8; z-index: 2; }
+        
+        /* KANAN: Form (55%) */
+        .auth-right { flex: 0 0 55%; display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; background: #ffffff; }
+        
+        .back-link { position: absolute; top: 40px; left: 40px; display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 14px; text-decoration: none; font-weight: 500; transition: 0.3s; }
+        .back-link:hover { color: var(--accent); }
+        
+        .auth-box { width: 100%; max-width: 380px; }
+        
+        .logo { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 30px; text-align: center; }
         .logo span { color: var(--accent); }
         
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
-        input { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-family: inherit; font-size: 14px; }
-        input:focus { border-color: var(--accent); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 14px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+        input { width: 100%; padding: 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); outline: none; font-family: inherit; font-size: 15px; transition: 0.3s; }
+        input:focus { border-color: var(--accent); background: #ffffff; box-shadow: 0 0 0 3px rgba(216, 91, 155, 0.1); }
         
-        .btn { width: 100%; padding: 14px; border-radius: 8px; border: none; background: var(--accent); color: var(--bg); font-weight: 800; font-size: 15px; cursor: pointer; margin-top: 8px; transition: 0.2s; }
-        .btn:hover { background: #5eead4; }
+        .btn { width: 100%; padding: 16px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 10px; font-family: inherit; transition: 0.3s; }
+        .btn:hover { background: #b8447c; }
         
-        .bottom-link { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted); }
-        .bottom-link a { color: var(--accent); font-weight: 600; text-decoration: none; }
-        .error-msg { color: #f87171; font-size: 12px; margin-top: 4px; }
-
-        /* Responsif untuk HP (Kalau di HP, gambar kiri disembunyiin) */
+        .bottom-link { text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-muted); }
+        .bottom-link a { color: var(--accent); font-weight: 700; text-decoration: none; }
+        
         @media (max-width: 768px) {
             .auth-left { display: none; }
-            .auth-right { background: var(--surface); padding: 16px; }
-            .auth-box { box-shadow: none; border: none; background: transparent; padding: 0; }
+            .auth-right { flex: 100%; padding: 20px; }
+            .back-link { top: 20px; left: 20px; }
         }
     </style>
 </head>
@@ -46,10 +83,12 @@
     <div class="auth-container">
         <div class="auth-left">
             <h2>Perikitty.</h2>
-            <p>Peralatan rumah tangga lengkap, elegan, dan terjangkau. Semua ada dalam satu toko.</p>
+            <p>Koleksi perabot dan peralatan rumah tangga elegan untuk menyempurnakan ruang impian Anda.</p>
         </div>
         <div class="auth-right">
+            <a href="{{ route('home') }}" class="back-link">&larr; Kembali ke Beranda</a>
             <div class="auth-box">
+                <div class="logo">Perikitty<span>.</span></div>
                 @yield('content')
             </div>
         </div>
