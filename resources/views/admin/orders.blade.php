@@ -153,28 +153,43 @@
             <tbody>
                 @forelse($orders as $order)
                 @php
+                    $buyerName = trim((string) (
+                        $order->name
+                        ?? $order->customer_name
+                        ?? $order->recipient_name
+                        ?? optional($order->user)->name
+                        ?? ''
+                    ));
+                    $buyerNameDisplay = $buyerName !== '' ? $buyerName : 'Tanpa Nama';
+
                     $rawStatus = trim((string) ($order->status ?? ''));
                     $stLower = strtolower($rawStatus);
                     $isDraft = $rawStatus === '' || str_contains($stLower, 'draft') || str_contains($stLower, 'draf') || str_contains($stLower, 'belum') || str_contains($stLower, 'menunggu') || str_contains($stLower, 'pending');
                     $displayStatus = (str_contains($stLower, 'proses') || $rawStatus === '')
                         ? ($isDraft ? 'Menunggu Kirim WA' : 'Terkirim ke WA')
                         : $rawStatus;
+
+                    $wilayahParts = array_values(array_filter([
+                        trim((string) ($order->village ?? '')),
+                        trim((string) ($order->district ?? '')),
+                    ]));
+                    $wilayahText = implode(', ', $wilayahParts);
                 @endphp
                 <tr class="order-row"
                     data-group="{{ $isDraft ? 'pending' : 'wa' }}"
-                    data-search="{{ strtolower(($order->order_number ?? '') . ' ' . ($order->name ?? '') . ' ' . ($order->address ?? '') . ' ' . ($order->district ?? '') . ' ' . $displayStatus) }}"
+                    data-search="{{ strtolower(($order->order_number ?? '') . ' ' . $buyerNameDisplay . ' ' . ($order->address ?? '') . ' ' . $wilayahText . ' ' . $displayStatus) }}"
                     data-order="{{ $order->order_number }}"
-                    data-name="{{ $order->name }}"
+                    data-name="{{ $buyerNameDisplay }}"
                     data-total="{{ $order->total }}"
                     data-status="{{ $displayStatus }}">
                     <td style="font-weight: 700; color: #261c22;">{{ $order->order_number }}</td>
                     <td>
-                        <strong>{{ $order->name }}</strong><br>
+                        <strong>{{ $buyerNameDisplay }}</strong><br>
                         <span style="font-size: 12px; color: #7c6b73;">{{ $order->phone ?? '-' }}</span>
                     </td>
                     <td style="font-size: 13px;">
-                        @if(!empty($order->district))
-                            <strong>{{ $order->village }}, {{ $order->district }}</strong><br>
+                        @if($wilayahText !== '')
+                            <strong>{{ $wilayahText }}</strong><br>
                         @endif
                         <span style="color: #6b5b63;">{{ $order->address }}</span>
                     </td>

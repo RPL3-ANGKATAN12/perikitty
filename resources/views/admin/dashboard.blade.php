@@ -1,5 +1,56 @@
 ﻿@extends('layouts.admin')
 @section('content')
+
+@php
+    $highlightId = session('last_product_id');
+    $latestProduct = $highlightId
+        ? ($products->firstWhere('id', $highlightId) ?? $products->sortByDesc('updated_at')->first())
+        : $products->sortByDesc('updated_at')->first();
+
+    $previewImgs = [];
+    if ($latestProduct) {
+        if (!empty($latestProduct->images)) {
+            $decoded = is_array($latestProduct->images) ? $latestProduct->images : json_decode($latestProduct->images, true);
+            if (is_array($decoded)) {
+                $previewImgs = array_values(array_filter($decoded));
+            }
+        }
+        if (empty($previewImgs) && !empty($latestProduct->image)) {
+            $previewImgs[] = $latestProduct->image;
+        }
+    }
+@endphp
+
+@if($latestProduct)
+<div style="margin-bottom: 20px; background: #fff9fc; border: 1.5px solid #f4cde1; border-radius: 18px; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+        @if(!empty($previewImgs))
+            <img src="{{ asset('storage/' . ltrim($previewImgs[0], '/')) }}" alt="{{ $latestProduct->name }}"
+                style="width: 72px; height: 72px; object-fit: cover; border-radius: 14px; border: 1px solid #f0c9dd; background: #fff;">
+        @endif
+        <div>
+            <div style="display: inline-block; background: #ffe0ef; color: #9e2f68; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; margin-bottom: 5px;">
+                {{ $highlightId ? 'BARU DIUPLOAD / DIUBAH' : 'TERAKHIR DIPERBARUI' }} &bull; {{ count($previewImgs) }} FOTO
+            </div>
+            <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #261c22;">{{ $latestProduct->name }}</h3>
+            <p style="margin: 3px 0 0; font-size: 13px; color: #6b5b63;">
+                Harga: <strong style="color: #d44b8d;">Rp {{ number_format($latestProduct->price ?? 0, 0, ',', '.') }}</strong>
+                &bull; Diperbarui: <strong>{{ optional($latestProduct->updated_at)->diffForHumans() ?? 'baru saja' }}</strong>
+            </p>
+        </div>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="{{ url('/') }}" target="_blank"
+            style="background: #ffffff; color: #8c2d5e; border: 1.5px solid #f0c9dd; padding: 9px 15px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 13px;">
+            Cek di Beranda
+        </a>
+        <a href="{{ route('products.show', $latestProduct->id) }}" target="_blank"
+            style="background: #d44b8d; color: #ffffff; padding: 9px 15px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 13px;">
+            Lihat Tampilan Produk
+        </a>
+    </div>
+</div>
+@endif
 <style>
     .dm-page {
         display: flex;
@@ -232,32 +283,41 @@
     .pill.out { background: #ffe4e6; color: #be123c; }
 
     .dm-act {
-        display: flex;
+        display: inline-flex;
         gap: 8px;
         align-items: center;
+        white-space: nowrap;
+    }
+    .dm-act form {
+        margin: 0;
+        display: inline-flex;
+    }
+    .btn-edit, .btn-del {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+        transition: all 0.15s ease;
     }
     .btn-edit {
-        background: #fff7ed;
-        color: #9a3412;
-        border: 1px solid #fed7aa;
-        padding: 7px 14px;
-        border-radius: 9px;
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fcd34d;
         text-decoration: none;
-        font-weight: 700;
-        font-size: 12px;
     }
-    .btn-edit:hover { background: #ffedd5; }
+    .btn-edit:hover { background: #fde68a; }
     .btn-del {
-        background: #fff1f2;
+        background: #ffe4e6;
         color: #be123c;
-        border: 1px solid #fecdd3;
-        padding: 7px 14px;
-        border-radius: 9px;
-        cursor: pointer;
-        font-weight: 700;
-        font-size: 12px;
+        border: 1px solid #fda4af;
     }
-    .btn-del:hover { background: #ffe4e6; }
+    .btn-del:hover { background: #fecdd3; }
 </style>
 
 <div class="dm-page">
@@ -406,3 +466,6 @@
     }
 </script>
 @endsection
+
+
+

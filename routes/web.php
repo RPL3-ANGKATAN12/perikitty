@@ -8,7 +8,6 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-// ===== Proses login, daftar, logout (boleh diakses siapa saja) =====
 Route::post('/login', function (Request $request) {
     if (Auth::attempt($request->only('email', 'password'))) {
         $request->session()->regenerate();
@@ -18,7 +17,6 @@ Route::post('/login', function (Request $request) {
     return back()->withErrors(['email' => 'Email atau password salah.']);
 });
 
-// Daftar HANYA untuk pembeli (is_admin tidak bisa diisi dari form)
 Route::post('/register', function (Request $request) {
     $data = $request->validate([
         'name' => 'required|string|max:255',
@@ -37,15 +35,18 @@ Route::post('/logout', function (Request $request) {
     return redirect('/');
 })->name('logout');
 
-// ===== TOKO (admin otomatis ditendang ke /admin) =====
+Route::get('/', function () {
+    $products = \App\Models\Product::latest()->get();
+    return view('home.index', compact('products'));
+})->name('home');
+Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+
 Route::middleware('not.admin')->group(function () {
-    Route::get('/', function () { return view('home.index'); })->name('home');
     Route::get('/about', function () { return view('about'); })->name('about');
     Route::get('/login', function () { return view('auth.login'); })->name('login');
     Route::get('/register', function () { return view('auth.register'); })->name('register');
 
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
     Route::get('/categories', function () { return view('categories.index'); })->name('categories.index');
 
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -58,13 +59,11 @@ Route::middleware('not.admin')->group(function () {
     Route::get('/konfirmasi/gagal', function () { return view('konfirmasi.gagal'); })->name('konfirmasi.gagal');
 });
 
-// ===== PROFIL PEMBELI =====
 Route::middleware(['auth', 'not.admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile/order/{id}', [ProfileController::class, 'show'])->name('profile.show');
 });
 
-// ===== ADMIN (pembeli yang coba buka akan ditendang ke beranda) =====
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/pesanan', [AdminController::class, 'orders'])->name('admin.orders');
