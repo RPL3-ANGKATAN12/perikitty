@@ -4,12 +4,17 @@
 <section style="padding: 60px 8%; background: #ffffff; min-height: 80vh;">
     <div style="max-width: 1000px; margin: auto;">
         <h1 style="font-size: 32px; font-family: 'Playfair Display', serif; color: var(--text); margin-bottom: 30px;">Keranjang Belanja</h1>
-        @if(session('success')) <div style="background:#d4edda; color:#155724; padding:16px; border-radius:8px; margin-bottom:20px;">{{ session('success') }}</div> @endif
+        @if(session('error')) <div style="background:#f8d7da; color:#721c24; padding:16px; border-radius:8px; margin-bottom:20px;">{{ session('error') }}</div> @endif
 
         @if(empty($cart))
             <div style="background: #faf7f9; border: 1px solid var(--border); border-radius: 16px; padding: 60px; text-align: center;">
                 <h2 style="color: var(--text);">Keranjang masih kosong.</h2>
-                <a href="{{ route('products.index') }}" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">Mulai Belanja</a>
+                <div style="margin-top: 24px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px;">
+                    <a href="{{ route('products.index') }}" class="btn btn-primary" style="margin: 0; padding: 12px 24px; border-radius: 999px; line-height: 1.2; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Mulai Belanja</a>
+                    @auth
+                    <a href="{{ route('profile.index') }}" style="padding: 12px 22px; border-radius: 999px; border: 1px solid var(--border); background: #fff; color: var(--text); text-decoration: none; font-weight: 600; line-height: 1.2; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;">Riwayat Pesanan</a>
+                    @endauth
+                </div>
             </div>
         @else
             <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px;">
@@ -37,9 +42,15 @@
                     <p style="color: var(--text-muted); margin-bottom: 4px;">Total Pembayaran</p>
                     <div style="font-size: 28px; font-weight: 800; color: var(--text);">Rp {{ number_format($total, 0, ',', '.') }}</div>
                 </div>
-                <a href="{{ route('checkout.index') }}" class="btn btn-primary" style="padding: 16px 32px; text-decoration: none;">Lanjut ke Checkout &rarr;</a>
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+                    @auth
+                    <a href="{{ route('profile.index') }}" style="padding: 14px 20px; border-radius: 12px; border: 1px solid var(--border); background: #fff; color: var(--text); text-decoration: none; font-weight: 600;">Riwayat Pesanan</a>
+                    @endauth
+                    <a href="{{ route('checkout.index') }}" class="btn btn-primary" style="padding: 16px 32px; text-decoration: none;">Lanjut ke Checkout &rarr;</a>
+                </div>
             </div>
         @endif
     </div>
 </section>
 @endsection
+

@@ -93,5 +93,61 @@
             </div>
         </div>
     </div>
+<!-- PERIKITTY_GUEST_INTERCEPT -->
+@guest
+<div id="perikittyGuestModal" style="display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:rgba(15,23,42,0.55);padding:16px;">
+    <div style="width:100%;max-width:420px;background:#ffffff;border-radius:18px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.25);text-align:center;border:1px solid #f1f5f9;">
+        <div style="width:52px;height:52px;margin:0 auto 14px;border-radius:9999px;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;">!</div>
+        <h3 style="margin:0 0 8px;font-size:19px;font-weight:800;color:#111827;">Login Diperlukan</h3>
+        <p style="margin:0 0 20px;font-size:14px;line-height:1.5;color:#4b5563;">
+            Silakan login terlebih dahulu untuk memasukkan produk ke keranjang atau melanjutkan belanja.
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;">
+            <button type="button" onclick="document.getElementById('perikittyGuestModal').style.display='none'" style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid #d1d5db;background:#ffffff;color:#374151;font-weight:600;cursor:pointer;">
+                Nanti Saja
+            </button>
+            <a href="{{ route('login') }}" style="flex:1;padding:10px 14px;border-radius:10px;background:#db2777;color:#ffffff;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+                Login
+            </a>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    function openGuestModal(e) {
+        var modal = document.getElementById('perikittyGuestModal');
+        if (!modal) return;
+        var hit = e.target.closest('form[action*="/cart"], form[action*="/checkout"], a[href*="/cart"], a[href*="/checkout"]');
+        if (hit) {
+            e.preventDefault();
+            e.stopPropagation();
+            modal.style.display = 'flex';
+        }
+    }
+    document.addEventListener('click', openGuestModal, true);
+    document.addEventListener('submit', openGuestModal, true);
+})();
+</script>
+@endguest
+<!-- END_PERIKITTY_GUEST_INTERCEPT -->
+<!-- PERIKITTY_ADMIN_BLOCKED -->
+@if (session('admin_blocked'))
+<div id="perikittyAdminBlockedModal" style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,0.55);padding:16px;">
+    <div style="width:100%;max-width:420px;background:#ffffff;border-radius:18px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.25);text-align:center;border:1px solid #f1f5f9;">
+        <div style="width:52px;height:52px;margin:0 auto 14px;border-radius:9999px;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;">!</div>
+        <h3 style="margin:0 0 8px;font-size:19px;font-weight:800;color:#111827;">Akses Admin Ditolak</h3>
+        <p style="margin:0 0 20px;font-size:14px;line-height:1.5;color:#4b5563;">
+            {{ session('admin_blocked') }}
+        </p>
+        <button type="button" onclick="document.getElementById('perikittyAdminBlockedModal').style.display='none'" style="width:100%;padding:10px 14px;border-radius:10px;background:#db2777;color:#ffffff;font-weight:700;border:none;cursor:pointer;">
+            Mengerti
+        </button>
+    </div>
+</div>
+@endif
+<!-- END_PERIKITTY_ADMIN_BLOCKED -->
 </body>
 </html>
+
+
+

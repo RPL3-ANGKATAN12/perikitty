@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Checkout - Perikitty')
 @section('content')
 <section style="padding: 80px 8%; background: #fff9fc; min-height: 80vh; display: flex; justify-content: center;">

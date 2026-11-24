@@ -2,18 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
+    private function getCartItemsForCheckout(): array
+    {
+        if (Auth::check()) {
+            $cart = [];
+            $items = CartItem::with('product')
+                ->where('user_id', Auth::id())
+                ->get();
+
+            foreach ($items as $item) {
+                if (!$item->product) continue;
+
+                $cart[$item->product_id] = [
+                    'product_id' => $item->product_id,
+                    'name' => $item->product->name,
+                    'qty' => (int) $item->qty,
+                    'price' => (int) $item->product->price,
+                ];
+            }
+
+            return $cart;
+        }
+
+        return session()->get('cart', []);
+    }
+
     public function index()
     {
-        $cart = session()->get('cart', []);
+        $cart = $this->getCartItemsForCheckout();
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'Keranjang kosong!');
         }
@@ -41,9 +68,16 @@ class CheckoutController extends Controller
             'address.min' => 'Alamat terlalu singkat, mohon isi alamat lengkap.',
         ]);
 
-        $cart = session()->get('cart', []);
+        $cart = $this->getCartItemsForCheckout();
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'Keranjang kosong!');
+        }
+
+        foreach ($cart as $cid => $d) {
+            $p = Product::find($d['product_id'] ?? $cid);
+            if (!$p || $p->stock < $d['qty']) {
+                return redirect()->route('cart.index')->with('error', 'Stok "' . $d['name'] . '" tidak mencukupi. Tersedia: ' . ($p->stock ?? 0) . ' pcs.');
+            }
         }
 
         $total = 0;
@@ -57,10 +91,10 @@ class CheckoutController extends Controller
         DB::beginTransaction();
         try {
             $order = Order::create([
-                'user_id' => auth()->id() ?? 1,
+                'user_id' => Auth::id() ?? 1,
                 'order_number' => 'ORD-' . strtoupper(uniqid()),
                 'customer_name' => $request->name,
-                'phone' => $request->phone ?? auth()->user()->phone ?? '-',
+                'phone' => $request->phone ?? (Auth::user()->phone ?? '-'),
                 'address' => $request->address . ', Kel. ' . $request->kelurahan,
                 'city' => 'Batam',
                 'province' => 'Kepulauan Riau',
@@ -78,18 +112,19 @@ class CheckoutController extends Controller
             $pesanWA .= "Detail Barang:\n";
 
             foreach ($cart as $id => $details) {
+                $productId = $details['product_id'] ?? $id;
                 $itemSubtotal = $details['price'] * $details['qty'];
 
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $id,
+                    'product_id' => $productId,
                     'product_name' => $details['name'],
                     'price' => $details['price'],
                     'quantity' => $details['qty'],
                     'subtotal' => $itemSubtotal,
                 ]);
 
-                $product = Product::find($id);
+                $product = Product::find($productId);
                 if ($product) {
                     $product->decrement('stock', $details['qty']);
                 }
@@ -101,13 +136,17 @@ class CheckoutController extends Controller
             $pesanWA .= "\nOngkir: Rp " . number_format($shipping, 0, ',', '.');
             $pesanWA .= "\nTotal: Rp " . number_format($grandTotal, 0, ',', '.') . "\n\nTerima kasih!";
 
-            DB::commit();
+            if (Auth::check()) {
+                CartItem::where('user_id', Auth::id())->delete();
+            }
             session()->forget('cart');
+
+            DB::commit();
 
             $waNumber = '6285835566771';
             $waUrl = "https://wa.me/" . $waNumber . "?text=" . urlencode($pesanWA);
 
-            return redirect($waUrl);
+            return redirect()->route('konfirmasi.sukses')->with('wa_url', $waUrl)->with('order_number', $order->order_number);
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -116,7 +155,7 @@ class CheckoutController extends Controller
                 'line' => $e->getLine(),
             ]);
 
-            return redirect()->route('konfirmasi.gagal');
+            return redirect()->route('konfirmasi.gagal')->with('checkout_gagal', true);
         }
     }
 }

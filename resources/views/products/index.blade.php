@@ -20,7 +20,7 @@
             @if($selectedCatId)
                 <input type="hidden" name="category" value="{{ $selectedCatId }}">
             @endif
-            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari barang..." style="padding: 10px 16px; border-radius: 999px; border: 1px solid #f0c9dc; background: #fffdfd; color: var(--text); font-size: 13px; min-width: 210px; outline: none;">
+            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari barang..." style="padding: 10px 16px; border-radius: 999px; border: 1px solid #f0c9dc; background: #fffdfd; color: var(--text); font-size: 13px; min-width: 210px; outline: none;" data-pk-search="1">
             <button type="submit" style="padding: 10px 20px; border-radius: 999px; border: none; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;">Cari</button>
         </form>
     </div>
@@ -38,7 +38,7 @@
     </div>
 
     @if(count($listProducts) > 0)
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px;" data-pk-grid="1">
             @foreach($listProducts as $product)
             <a href="{{ route('products.show', $product->id) }}" style="text-decoration: none; display: block;">
                 <div style="background: linear-gradient(180deg, #fffdfd 0%, #ffeaf2 100%); border: 1px solid #f2cde0; border-radius: 16px; padding: 12px; height: 100%; transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; box-shadow: 0 6px 18px rgba(219, 39, 119, 0.05);"
@@ -72,4 +72,89 @@
     @endif
 </section>
 
+
+<!-- PERIKITTY_LIVE_SEARCH -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.querySelector('[data-pk-search="1"]') || document.querySelector('input[name="q"]');
+    if (!input) return;
+
+    const form = input.closest('form');
+    const grid = document.querySelector('[data-pk-grid="1"]') || Array.from(document.querySelectorAll('div')).find(function (el) {
+        return el.style && el.style.display === 'grid' && el.children.length > 0;
+    });
+
+    if (!grid) return;
+
+    const cards = Array.from(grid.children);
+
+    let emptyBox = document.querySelector('[data-pk-empty="1"]');
+    if (!emptyBox) {
+        emptyBox = document.createElement('div');
+        emptyBox.setAttribute('data-pk-empty', '1');
+        emptyBox.style.cssText = 'display:none;text-align:center;padding:56px 24px;background:#fff7fa;border:1px solid #f2cde0;border-radius:18px;max-width:520px;margin:24px auto 0;';
+        emptyBox.innerHTML = '<p style="font-family:\'Playfair Display\',serif;font-size:20px;color:var(--text,#1f2937);margin:0 0 8px;">Produk tidak ditemukan</p><p style="color:var(--text-muted,#6b7280);font-size:13px;margin:0 0 18px;">Coba kata kunci lain atau kosongkan kolom pencarian.</p><button type="button" data-pk-reset style="padding:10px 22px;background:var(--accent,#db2777);color:#fff;border:none;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">Reset Pencarian</button>';
+        grid.parentNode.insertBefore(emptyBox, grid.nextSibling);
+
+        const resetBtn = emptyBox.querySelector('[data-pk-reset]');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function () {
+                input.value = '';
+                runFilter('');
+                input.focus();
+            });
+        }
+    }
+
+    function runFilter(val) {
+        const q = (val || '').trim().toLowerCase();
+        let shown = 0;
+
+        cards.forEach(function (card) {
+            const heading = card.querySelector('h2, h3');
+            const haystack = ((heading ? heading.textContent : '') + ' ' + (card.textContent || '')).toLowerCase();
+            const isMatch = !q || haystack.indexOf(q) !== -1;
+            card.style.display = isMatch ? '' : 'none';
+            if (isMatch) shown++;
+        });
+
+        grid.style.display = shown > 0 ? 'grid' : 'none';
+        emptyBox.style.display = shown === 0 ? 'block' : 'none';
+
+        try {
+            const url = new URL(window.location.href);
+            if (q) {
+                url.searchParams.set('q', val.trim());
+            } else {
+                url.searchParams.delete('q');
+            }
+            window.history.replaceState({}, '', url.toString());
+        } catch (e) {}
+    }
+
+    let debounceTimer = null;
+    input.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        const current = input.value;
+        debounceTimer = setTimeout(function () {
+            runFilter(current);
+        }, 150);
+    });
+
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            clearTimeout(debounceTimer);
+            runFilter(input.value);
+        });
+    }
+
+    if (input.value && input.value.trim() !== '') {
+        runFilter(input.value);
+    }
+});
+</script>
+<!-- END_PERIKITTY_LIVE_SEARCH -->
+
 @endsection
+

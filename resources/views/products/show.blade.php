@@ -56,7 +56,7 @@
             $descItems[] = ['type' => 'spacer'];
             continue;
         }
-        if (preg_match('/^[-*ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢]\s+(.+)$/u', $t, $m)) {
+        if (preg_match('/^[-*ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢]\s+(.+)$/u', $t, $m)) {
             $descItems[] = ['type' => 'bullet', 'text' => $m[1]];
         } else {
             $descItems[] = ['type' => 'line', 'text' => $t];
@@ -292,7 +292,7 @@
         margin: 0 0 2px;
     }
     .sp-desc-bullet::before {
-        content: "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢";
+        content: "ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢";
         position: absolute;
         left: 2px;
         color: var(--accent, #d44b8d);
@@ -421,9 +421,26 @@
                     </div>
                 </div>
 
+                <div style="margin:0 0 14px; padding:12px 14px; border-radius:12px; background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; font-size:13px; line-height:1.5;">
+                    <strong>Keterangan:</strong> Warna atau motif dikirim acak sesuai stok yang tersedia. Mau request warna atau motif tertentu? Hubungi admin lewat WhatsApp sebelum membayar.
+                </div>
+
                 <form action="{{ route('cart.add', $product->id) }}" method="POST">
                     @csrf
                     <button type="submit" class="btn btn-primary sp-add-btn">Tambah ke Keranjang</button>
+                    <div class="mt-4 rounded-2xl border border-pink-100 bg-pink-50/50 px-4 py-3 text-xs text-stone-700">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="font-semibold text-pink-800">
+                                SKU: #PK-{{ str_pad($product->id ?? 9, 3, '0', STR_PAD_LEFT) }}
+                            </span>
+                            <span class="rounded-full bg-white px-2.5 py-0.5 font-medium text-pink-700 shadow-2xs">
+                                {{ !empty($product->video) ? 'Video + ' : '' }}{{ is_array($product->images) ? count($product->images) : (is_string($product->images) && $product->images !== '' ? (is_array($decoded = json_decode($product->images, true)) ? count($decoded) : 1) : 0) }} Foto Slide
+                            </span>
+                        </div>
+                        <p class="mt-1.5 leading-relaxed text-stone-600">
+                            Tersedia konfirmasi pesanan langsung via WhatsApp dengan rincian ongkir otomatis sesuai area pengiriman.
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>
@@ -503,4 +520,19 @@
     }
 })();
 </script>
+<!-- PERIKITTY_SINGLE_PHOTO_SS -->
+<style>
+.sp-thumbs,
+.sp-gallery-thumbs,
+.sp-slider-nav,
+.sp-dots,
+[class*="thumb"] {
+    display: none !important;
+}
+</style>
+<!-- END_PERIKITTY_SINGLE_PHOTO_SS -->
+
 @endsection
+<div class="mt-4 rounded-2xl border border-pink-100 bg-pink-50/50 px-4 py-3 text-xs text-stone-700">
+
+

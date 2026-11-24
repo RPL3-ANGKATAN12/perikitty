@@ -12,7 +12,7 @@ Route::post('/login', function (Request $request) {
     if (Auth::attempt($request->only('email', 'password'))) {
         $request->session()->regenerate();
         if (auth()->user()->is_admin) { return redirect()->route('admin.dashboard'); }
-        return redirect('/');
+        return redirect('/')->with('success', 'Login berhasil! Selamat datang kembali di Perikitty.');
     }
     return back()->withErrors(['email' => 'Email atau password salah.']);
 });
@@ -25,14 +25,14 @@ Route::post('/register', function (Request $request) {
     ]);
     $user = \App\Models\User::create($data);
     Auth::login($user);
-    return redirect('/');
+    return redirect('/')->with('success', 'Kamu berhasil keluar dari akun.');
 });
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
-    return redirect('/');
+    return redirect('/')->with('success', 'Kamu berhasil keluar dari akun.');
 })->name('logout');
 
 Route::get('/', function () {
@@ -49,17 +49,24 @@ Route::middleware('not.admin')->group(function () {
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/categories', function () { return view('categories.index'); })->name('categories.index');
 
+
+});
+
+Route::middleware(['auth', 'not.admin'])->group(function () {
+    Route::get('/konfirmasi/sukses', function () {
+        if (!session()->has('wa_url')) { return redirect()->route('home'); }
+        return view('konfirmasi.sukses');
+    })->name('konfirmasi.sukses');
+    Route::get('/konfirmasi/gagal', function () {
+        if (!session()->has('checkout_gagal')) { return redirect()->route('home'); }
+        return view('konfirmasi.gagal');
+    })->name('konfirmasi.gagal');
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::get('/konfirmasi/sukses', function () { return view('konfirmasi.sukses'); })->name('konfirmasi.sukses');
-    Route::get('/konfirmasi/gagal', function () { return view('konfirmasi.gagal'); })->name('konfirmasi.gagal');
-});
-
-Route::middleware(['auth', 'not.admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile/order/{id}', [ProfileController::class, 'show'])->name('profile.show');
 });

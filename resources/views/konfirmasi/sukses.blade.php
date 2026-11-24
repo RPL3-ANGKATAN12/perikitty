@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Pesanan Berhasil - Perikitty')
 @section('content')
 <section style="padding: 90px 8%; min-height: 75vh; display: flex; justify-content: center; align-items: center; background: #fff;">
@@ -13,4 +13,9 @@
         </div>
     </div>
 </section>
+@if(session('wa_url'))
+<div style="max-width:560px; margin:0 auto 40px; padding:0 20px;">
+    <a href="{{ session('wa_url') }}" style="display:block; text-align:center; padding:16px; border-radius:12px; background:#25D366; color:#fff; font-weight:700; text-decoration:none;">Lanjut Kirim Pesanan ke WhatsApp</a>
+</div>
+@endif
 @endsection

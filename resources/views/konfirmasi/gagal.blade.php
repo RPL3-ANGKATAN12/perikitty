@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Pesanan Gagal - Perikitty')
 @section('content')
 <section style="padding: 90px 8%; min-height: 75vh; display: flex; justify-content: center; align-items: center; background: #fff;">

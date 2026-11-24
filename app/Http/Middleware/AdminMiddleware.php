@@ -11,7 +11,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user()?->is_admin) {
-            return redirect()->route('home');
+            return redirect()->route('home')->with('admin_blocked', 'Halaman Admin hanya bisa diakses oleh akun Admin.');
         }
 
         return $next($request);
